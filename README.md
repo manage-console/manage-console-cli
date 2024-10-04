@@ -68,7 +68,7 @@ And the following files:
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/muhammad-nabih/manage-console-cli/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/manage-console/manage-console-cli/issues).
 
 ## 📝 License
 
