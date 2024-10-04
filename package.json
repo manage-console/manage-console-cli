@@ -1,0 +1,58 @@
+{
+  "name": "manage-console-cli",
+  "version": "1.0.0",
+  "description": "A powerful CLI tool to manage console.log statements in your JavaScript/TypeScript projects",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "husky"
+  },
+  "bin": {
+    "console-manager": "./dist/index.js"
+  },
+  "keywords": [
+    "console",
+    "debug",
+    "cli",
+    "development",
+    "tools",
+    "console.log",
+    "cleanup",
+    "javascript",
+    "typescript"
+  ],
+  "author": "Mohamed Nabih",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/muhammad-nabih/manage-console-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/muhammad-nabih/manage-console-cli/issues"
+  },
+  "homepage": "https://github.com/muhammad-nabih/manage-console-cli#readme",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "husky": "^9.1.6",
+    "lint-staged": "^14.0.0",
+    "prettier": "^3.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write"
+    ],
+    "*.{json,md,css}": "prettier --write"
+  }
+}
