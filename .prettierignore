@@ -18,3 +18,6 @@ coverage/
 
 # Ignore log files
 *.log
+
+# json files
+*.json
