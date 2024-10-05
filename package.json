@@ -9,7 +9,10 @@
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "format": "prettier --write \"src/**/*.ts\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release:patch": "gh workflow run CI.yml -f version_increment=patch",
+    "release:minor": "gh workflow run CI.yml -f version_increment=minor",
+    "release:major": "gh workflow run CI.yml -f version_increment=major"
   },
   "bin": {
     "console-manager": "./dist/index.js"
