@@ -35,6 +35,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        # استخدم npm install بدلاً من npm ci
         run: npm install
 
       - name: Build
