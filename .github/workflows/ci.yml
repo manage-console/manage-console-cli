@@ -56,7 +56,7 @@ jobs:
 
       # Step 7: Publish to NPM
       - name: Publish to NPM
-        # فقط إذا كان هناك تغيير في الإصدار
+
         if: success() && steps.version-check.outcome == 'success'
         run: npm publish
         env:
