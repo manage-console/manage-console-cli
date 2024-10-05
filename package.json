@@ -1,6 +1,6 @@
 {
   "name": "manage-console-cli",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A powerful CLI tool to manage console.log statements in your JavaScript/TypeScript projects",
   "main": "dist/index.js",
   "scripts": {
