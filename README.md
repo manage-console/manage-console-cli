@@ -20,6 +20,12 @@ Install the package globally using npm:
 npm install -g manage-console-cli
 ```
 
+Install the package as a dev dependency in your project:
+
+```bash
+npm install manage-console-cli --save-dev
+```
+
 ## 🛠️ Usage
 
 ### Remove console.log statements
@@ -31,20 +37,6 @@ console-manager remove --file path/to/your/file.js
 ```
 
 To remove console.log statements from all files in the current directory and its subdirectories:
-
-```bash
-console-manager remove --all
-```
-
-### Comment out console.log statements
-
-To comment out console.log statements in a specific file:
-
-```bash
-console-manager comment --file path/to/your/file.js
-```
-
-To comment out console.log statements in all files in the current directory and its subdirectories:
 
 ```bash
 console-manager comment --all
@@ -66,9 +58,17 @@ And the following files:
 - package.json
 - package-lock.json
 
+## 🧩 VS Code Extension
+
+If you prefer a visual interface, you can use our VS Code extension that provides the same functionality:
+
+[CLG Manager for VS Code](https://marketplace.visualstudio.com/items?itemName=ConsoleManager.clg-manger)
+
+This extension allows you to manage console.log statements directly from your VS Code editor.
+
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/muhammad-nabih/manage-console-cli/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/manage-console/manage-console-cli/issues).
 
 ## 📝 License
 

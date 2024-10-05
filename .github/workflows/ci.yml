@@ -1,42 +1,43 @@
-name: CI Workflow
-
+name: CI Workflow and NPM Publish
 on:
   push:
     branches:
       - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
-
     steps:
       # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js (use the version specified in package.json)
+      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      # Step 5: Run Prettier (format check)
-      - name: Run Prettier
-        run: npm run format
-
-      # Step 6: Build the project
+      # Step 4: Build the project
       - name: Build the project
         run: npm run build
 
-      # Step 7: (Optional) Run tests if you have any
-      # - name: Run tests
-      #   run: npm run test
+      # Step 5: Publish to NPM
+      - name: Publish to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Step 6: Create GitHub Release
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm version patch
+          git push --follow-tags
+          gh release create $(npm pkg get version | tr -d '"') -t "Release $(npm pkg get version | tr -d '"')" -n "Release notes for version $(npm pkg get version | tr -d '"')"
