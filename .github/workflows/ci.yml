@@ -40,10 +40,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Add actual tests when you have them
-      # - name: Run tests
-      #   run: npm test
-
   publish:
     needs: build-and-test
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.version_increment != 'none'
@@ -61,13 +57,8 @@ jobs:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Set up Git user
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build
         run: npm run build
@@ -79,29 +70,9 @@ jobs:
           NEW_VERSION=$(npm version ${{ github.event.inputs.version_increment }} -m "Release %s [skip ci]")
           echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
 
-      - name: Update CHANGELOG
-        run: |
-          VERSION=${NEW_VERSION#v}
-          DATE=$(date +%Y-%m-%d)
-
-          # Prepare new version entry
-          echo -e "\n## [${VERSION}] - ${DATE}\n\n### Added\n- \n\n### Changed\n- \n\n### Fixed\n- " | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md
-
-          # Open PR for changelog update
-          git checkout -b changelog-${VERSION}
-          git add CHANGELOG.md
-          git commit -m "Update CHANGELOG for ${VERSION}"
-          git push origin changelog-${VERSION}
-
-          gh pr create --title "Update CHANGELOG for ${VERSION}" \
-                       --body "Please update the changelog with the appropriate changes." \
-                       --base main \
-                       --head changelog-${VERSION}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-
       - name: Push changes
-        run: git push --follow-tags
+        run: |
+          git push origin main --follow-tags
 
       - name: Publish to NPM
         run: npm publish
