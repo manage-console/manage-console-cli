@@ -1,78 +1,117 @@
-
-name: CI Workflow and NPM Publish
+name: CI Workflow
 
 on:
   workflow_dispatch:
+    inputs:
+      version_increment:
+        description: 'Version increment type'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - patch
+          - minor
+          - major
   push:
     branches:
       - main
     paths-ignore:
       - 'package.json'
       - 'package-lock.json'
+      - 'CHANGELOG.md'
 
 jobs:
-  build-and-publish:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      # Add actual tests when you have them
+      # - name: Run tests
+      #   run: npm test
+
+  publish:
+    needs: build-and-test
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.version_increment != 'none'
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
 
-      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
 
-      # Step 3: Set up Git user
       - name: Set up Git user
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      # Step 4: Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      # Step 5: Build the project
-      - name: Build the project
+      - name: Build
         run: npm run build
 
-      # Step 6: Update version and push
-      - name: Check last commit and update version
+      - name: Update version
+        id: version
         run: |
-          if [[ "$(git log -1 --pretty=%B)" != *"[skip ci]"* ]]; then
-            npm version patch
-            git push --follow-tags -m "[skip ci]"
-          else
-            echo "Skipping version update as this was triggered by an automated commit"
-          fi
+          git pull origin main
+          NEW_VERSION=$(npm version ${{ github.event.inputs.version_increment }} -m "Release %s [skip ci]")
+          echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Update CHANGELOG
+        run: |
+          VERSION=${NEW_VERSION#v}
+          DATE=$(date +%Y-%m-%d)
+
+          # Prepare new version entry
+          echo -e "\n## [${VERSION}] - ${DATE}\n\n### Added\n- \n\n### Changed\n- \n\n### Fixed\n- " | cat - CHANGELOG.md > temp && mv temp CHANGELOG.md
+
+          # Open PR for changelog update
+          git checkout -b changelog-${VERSION}
+          git add CHANGELOG.md
+          git commit -m "Update CHANGELOG for ${VERSION}"
+          git push origin changelog-${VERSION}
+
+          gh pr create --title "Update CHANGELOG for ${VERSION}" \
+                       --body "Please update the changelog with the appropriate changes." \
+                       --base main \
+                       --head changelog-${VERSION}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
-      # Step 7: Publish to NPM
+      - name: Push changes
+        run: git push --follow-tags
+
       - name: Publish to NPM
-
-        if: success() && steps.version-check.outcome == 'success'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Step 8: Create GitHub Release
       - name: Create GitHub Release
-        if: success() && steps.version-check.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          VERSION=$(npm pkg get version | tr -d '"')
-          if gh release view $VERSION &>/dev/null; then
-            echo "Release $VERSION already exists"
-          else
-            gh release create $VERSION \
-              --title "Release $VERSION" \
-              --notes "Release notes for version $VERSION"
-          fi
+          gh release create ${{ steps.version.outputs.new_version }} \
+            --title "Release ${{ steps.version.outputs.new_version }}" \
+            --notes "Please see CHANGELOG.md for details"
