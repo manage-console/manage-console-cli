@@ -1,12 +1,13 @@
+
 name: CI Workflow and NPM Publish
 
 on:
-  workflow_dispatch:  # للسماح بالتشغيل اليدوي
+  workflow_dispatch:
   push:
     branches:
       - main
     paths-ignore:
-      - 'package.json'  # تجاهل التغييرات في ملف الإصدار
+      - 'package.json'
       - 'package-lock.json'
 
 jobs:
