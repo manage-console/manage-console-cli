@@ -32,12 +32,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          # إزالة cache للتجنب مشكلة التحقق من ملف lock
-          # cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm install
 
       - name: Build
         run: npm run build
@@ -58,6 +55,11 @@ jobs:
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
 
       - name: Install dependencies
         run: npm install
