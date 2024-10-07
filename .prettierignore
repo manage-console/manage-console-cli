@@ -20,4 +20,5 @@ coverage/
 *.log
 
 # json files
-*.json
+package.json
+package-lock.json
