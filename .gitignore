@@ -17,3 +17,4 @@ out/
 
 # Ignore TypeScript build files
 *.tsbuildinfo
+cleanup-versions.sh
